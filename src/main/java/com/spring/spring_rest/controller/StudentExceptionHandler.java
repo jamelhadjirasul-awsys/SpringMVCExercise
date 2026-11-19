@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
+// import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -89,21 +89,21 @@ public class StudentExceptionHandler {
         return new ResponseEntity<>(err, HttpStatus.CONFLICT);
     }
 
-    /**
-     * Returns an unauthorized response when authentication fails.
-     *
-     * @param ex exception raised during authentication
-     * @return an unauthorized response with an incorrect-credentials message
-     */
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<StudentErrorResponse> handleAuthenticationException(
-            AuthenticationException ex) {
+    // /**
+    //  * Returns an unauthorized response when authentication fails.
+    //  *
+    //  * @param ex exception raised during authentication
+    //  * @return an unauthorized response with an incorrect-credentials message
+    //  */
+    // @ExceptionHandler(AuthenticationException.class)
+    // public ResponseEntity<StudentErrorResponse> handleAuthenticationException(
+    //         AuthenticationException ex) {
         
-        StudentErrorResponse err = new StudentErrorResponse();
-        err.setStatus(HttpStatus.UNAUTHORIZED.value());
-        err.setMessage("Username or password is incorrect");
-        err.setTimeStamp(System.currentTimeMillis());
+    //     StudentErrorResponse err = new StudentErrorResponse();
+    //     err.setStatus(HttpStatus.UNAUTHORIZED.value());
+    //     err.setMessage("Username or password is incorrect");
+    //     err.setTimeStamp(System.currentTimeMillis());
 
-        return new ResponseEntity<>(err, HttpStatus.UNAUTHORIZED);
-    }
+    //     return new ResponseEntity<>(err, HttpStatus.UNAUTHORIZED);
+    // }
 }
