@@ -1,3 +1,8 @@
+/**
+ * Validates the student form's name and email fields and 
+ * displays field errors.
+ * @returns {boolean} whether all fields pass validation
+ */
 function validateStudentForm() {
     let isValid = true;
 
@@ -11,31 +16,30 @@ function validateStudentForm() {
 
     clearValidationStyles();
 
-    // First Name Validation
     if (firstName.value.trim() === "") {
         firstNameError.textContent = "First name is required.";
         firstName.classList.add("invalid");
         isValid = false;
     }
     else if (firstName.value.trim().length < 2) {
-        firstNameError.textContent = "First name must be atleast 2 characters long.";
+        firstNameError.textContent = 
+                    "First name must be atleast 2 characters long.";
         firstName.classList.add("invalid");
         isValid = false;
     }
 
-    // Last Name Validation
     if (lastName.value.trim() === "") {
         lastNameError.textContent = "Last name is required.";
         lastName.classList.add("invalid");
         isValid = false;
     }
     else if (lastName.value.trim().length < 2) {
-        lastNameError.textContent = "Last name must be atleast 2 characters long.";
+        lastNameError.textContent = 
+                    "Last name must be atleast 2 characters long.";
         lastName.classList.add("invalid");
         isValid = false;
     }
 
-    // Email Validation
     const emailValue = email.value.trim();
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -45,13 +49,18 @@ function validateStudentForm() {
         isValid = false;
     }
     else if (!emailRegex.test(emailValue)) {
-        emailError.textContent = "Please enter a valid email address (e.g., student@example.com).";
+        emailError.textContent = 
+            "Please enter a valid email address (e.g., student@example.com).";
         email.classList.add("invalid");
         isValid = false;
     }
     return isValid;
 }
 
+/**
+ * Removes invalid styling and clears validation messages from the form.
+ * @returns {void}
+ */
 function clearValidationStyles() {
     const fields = ["firstName", "lastName", "email"];
     fields.forEach(fieldId => {

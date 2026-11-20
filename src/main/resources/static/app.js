@@ -22,12 +22,13 @@ async function createStudent(studentData) {
         }
         else {
             const errorDetails = await response.text();
-            alert(`Error adding student (${response.status}): ${errorDetails || response.statusText}`);
+            alert(`Error adding student (${response.status}): 
+                        ${errorDetails || response.statusText}`);
         }
     }
     catch (error) {
         console.error("Error creating student:", error);
-        alert("Could not connect to the server. Check that the application is running, then try again.");
+        alert("Server unavailable. Check that the app is running.");
     }
 }
 
@@ -94,8 +95,11 @@ async function getAllStudents() {
                     <td>${student.lastName}</td>
                     <td>${student.email}</td>
                     <td>
-                        <button class="btn-edit" onClick="initializesStudentFormById(${student.id})">Edit</button>
-                        <button class="btn-delete" onClick="deleteStudent(${student.id})">Delete</button>
+                        <button class="btn-edit" 
+                        onClick="initializesStudentFormById(${student.id})"
+                        >Edit</button>
+                        <button class="btn-delete" 
+                        onClick="deleteStudent(${student.id})">Delete</button>
                     </td>
                 </tr>
             `;
@@ -104,7 +108,7 @@ async function getAllStudents() {
     }
     catch (error) {
         console.error("Error fetching students:", error);
-        alert("Failed to fetch students. Is your Spring Boot backend running?");
+        alert("Failed to fetch. Is your Spring Boot backend running?");
     }
 }
 
@@ -142,7 +146,8 @@ async function initializesStudentFormById(id) {
 }
 
 /**
- * Sends updated student data to the API, then resets the form and refreshes the list.
+ * Sends updated student data to the API, 
+ * then resets the form and refreshes the list.
  * @param {number|string} id the ID of the student to update
  * @param {{firstName: string, lastName: string, email: string}} studentData
  * @returns {Promise<void>}
@@ -201,7 +206,8 @@ async function deleteStudent(id) {
 
 /**
  * Attempts session login and navigates to the dashboard on success.
- * @param {{username: string, password: string}} loginDto credentials provided by the caller
+ * @param {{username: string, password: string}} 
+ * loginDto credentials provided by the caller
  * @returns {Promise<void>}
  */
 async function loginUser(loginDto) {
