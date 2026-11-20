@@ -10,8 +10,9 @@ async function createStudent(studentData) {
         });
 
         if (response.ok) {
-            alert("Student added successfully!");
             resetForm();
+            await getAllStudents();
+            alert("Student added successfully!");
         }
         else {
             const errorDetails = await response.text();
@@ -50,3 +51,36 @@ function resetForm() {
     submitBtn.textContent = "Add Student";
     submitBtn.style.backgroundColor = "#28a745";
 }
+
+async function getAllStudents() {
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const students = await response.json();
+        const tableBody = document.getElementById("studentTableBody");
+        tableBody.innerHTML = "";
+
+        students.forEach(student => {
+            const row = `
+                <tr>
+                    <td>${student.id}</td>
+                    <td>${student.firstName}</td>
+                    <td>${student.lastName}</td>
+                    <td>${student.email}</td>
+                    <td>
+                        <button class="btn-edit" onClick="initializeStudentFormById(${student.id})">Edit</button>
+                        <button class="btn-delete" onClick="deleteStudent(${student.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+    catch (error) {
+        console.error("Error fetching students:", error);
+        alert("Failed to fetch students. Is your Spring Boot backend running?");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", getAllStudents);
