@@ -1,11 +1,17 @@
-const API_URL = "http://localhost:8080/api/students"
+const API_URL = "http://localhost:8080/api/students";
+const API_AUTH = "http://localhost:8080/api/auth";
 
-// create a student
+/**
+ * Sends a new student to the API, then resets the form and refreshes the list.
+ * @param {{firstName: string, lastName: string, email: string}} studentData
+ * @returns {Promise<void>}
+ */
 async function createStudent(studentData) {
     try {
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify(studentData)
         });
 
@@ -25,6 +31,10 @@ async function createStudent(studentData) {
     }
 }
 
+/**
+ * Validates the form and dispatches a create or update request on submission.
+ * @param {SubmitEvent} e the form submission event
+ */
 document.getElementById("studentForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -46,7 +56,10 @@ document.getElementById("studentForm").addEventListener("submit", function(e) {
     }
 });
 
-// Helper function to reset form state
+/**
+ * Clears the form and restores its default submit-button state.
+ * @returns {void}
+ */
 function resetForm() {
     document.getElementById("studentId").value = "";
     document.getElementById("studentForm").reset();
@@ -57,9 +70,16 @@ function resetForm() {
     submitBtn.style.backgroundColor = "#28a745";
 }
 
+/**
+ * Fetches all students and renders them in the student table.
+ * @returns {Promise<void>}
+ */
 async function getAllStudents() {
     try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            method: "GET",
+            credentials: "include"
+        });
         if (!response.ok) throw new Error("Network response was not ok");
 
         const students = await response.json();
@@ -90,9 +110,17 @@ async function getAllStudents() {
 
 document.addEventListener("DOMContentLoaded", getAllStudents);
 
+/**
+ * Loads a student's data into the form for editing.
+ * @param {number|string} id the ID of the student to load
+ * @returns {Promise<void>}
+ */
 async function initializesStudentFormById(id) {
     try {
-        const response = await fetch(`${API_URL}/${id}`);
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "GET",
+            credentials: "include"
+        });
         if (!response.ok) throw new Error("Could not fetch student details");
 
         const student = await response.json();
@@ -102,12 +130,10 @@ async function initializesStudentFormById(id) {
         document.getElementById("lastName").value = student.lastName;
         document.getElementById("email").value = student.email;
 
-        // button changes when edit button is triggered
         const submitBtn = document.getElementById("submitBtn");
         submitBtn.textContent = "Update";
         submitBtn.style.backgroundColor = "#007bff";
 
-        // clear old error highlights when loading data into form
         clearValidationStyles();
     }
     catch (error) {
@@ -115,11 +141,18 @@ async function initializesStudentFormById(id) {
     }
 }
 
+/**
+ * Sends updated student data to the API, then resets the form and refreshes the list.
+ * @param {number|string} id the ID of the student to update
+ * @param {{firstName: string, lastName: string, email: string}} studentData
+ * @returns {Promise<void>}
+ */
 async function updateStudent(id, studentData) {
     try {
         const response = await fetch (`${API_URL}/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify(studentData)
         });
 
@@ -137,11 +170,17 @@ async function updateStudent(id, studentData) {
     }
 }
 
+/**
+ * Deletes a student after confirmation and refreshes the student list.
+ * @param {number|string} id the ID of the student to delete
+ * @returns {Promise<void>}
+ */
 async function deleteStudent(id) {
     if (confirm("Are you sure you want to delete this student?")) {
         try {
             const response = await fetch(`${API_URL}/${id}`, {
-            method: "DELETE"
+                method: "DELETE",
+                credentials: "include"
             });
 
             if (response.ok) {
@@ -159,3 +198,64 @@ async function deleteStudent(id) {
         }
     }
 }
+
+/**
+ * Attempts session login and navigates to the dashboard on success.
+ * @param {{username: string, password: string}} loginDto credentials provided by the caller
+ * @returns {Promise<void>}
+ */
+async function loginUser(loginDto) {
+    try {
+        const response = await fetch(`${API_AUTH}/auth_login_session`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            credentials: "include"
+        });
+
+        if (response.ok) {
+            alert("Login successfull!");
+            window.location.href = "index.html";
+        }
+        else {
+            alert("Invalid credentials.");
+        }
+    }
+    catch (error) {
+        console.error("Login error:", error);
+    }
+}
+
+/**
+ * Ends the current session, clears the dashboard, and reloads the page.
+ * @returns {Promise<void>}
+ */
+async function logoutUser() {
+    try {
+        await fetch(`${API_AUTH}/logout`, {
+            method: "POST",
+            credentials: "include"
+        });
+        document.getElementById("studentTableBody").innerHTML = "";
+        resetForm();
+        alert("Logged out successfully!");
+
+        try {
+            await fetch(API_URL, {
+                method: "GET",
+                headers: {
+                    "Authorization:": "Basic " + 
+                                btoa("invalid_user:wrong_password")
+                }
+            });
+        }
+        catch (err) {
+            console.log("Browser credential cache cleared.");
+        }
+        window.location.reload();
+    }
+    catch (e) {
+        console.error("Logout transmission crash:", e);
+    }
+}
+
+
