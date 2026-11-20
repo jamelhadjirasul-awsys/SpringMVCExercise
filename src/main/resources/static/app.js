@@ -38,7 +38,12 @@ document.getElementById("studentForm").addEventListener("submit", function(e) {
         lastName: document.getElementById("lastName").value.trim(),
         email: document.getElementById("email").value.trim()
     };
-    createStudent(studentData);
+    if (id) {
+        updateStudent(id, studentData);
+    }
+    else {
+        createStudent(studentData);
+    }
 });
 
 // Helper function to reset form state
@@ -69,7 +74,7 @@ async function getAllStudents() {
                     <td>${student.lastName}</td>
                     <td>${student.email}</td>
                     <td>
-                        <button class="btn-edit" onClick="initializeStudentFormById(${student.id})">Edit</button>
+                        <button class="btn-edit" onClick="initializesStudentFormById(${student.id})">Edit</button>
                         <button class="btn-delete" onClick="deleteStudent(${student.id})">Delete</button>
                     </td>
                 </tr>
@@ -84,3 +89,73 @@ async function getAllStudents() {
 }
 
 document.addEventListener("DOMContentLoaded", getAllStudents);
+
+async function initializesStudentFormById(id) {
+    try {
+        const response = await fetch(`${API_URL}/${id}`);
+        if (!response.ok) throw new Error("Could not fetch student details");
+
+        const student = await response.json();
+
+        document.getElementById("studentId").value = student.id;
+        document.getElementById("firstName").value = student.firstName;
+        document.getElementById("lastName").value = student.lastName;
+        document.getElementById("email").value = student.email;
+
+        // button changes when edit button is triggered
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.textContent = "Update";
+        submitBtn.style.backgroundColor = "#007bff";
+
+        // clear old error highlights when loading data into form
+        clearValidationStyles();
+    }
+    catch (error) {
+        console.error("Error fetching student details:", error)
+    }
+}
+
+async function updateStudent(id, studentData) {
+    try {
+        const response = await fetch (`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(studentData)
+        });
+
+        if (response.ok) {
+            resetForm();
+            await getAllStudents();
+            alert("Student updated successfully!");
+        }
+        else {
+            alert("Error updating student.");
+        }
+    }
+    catch (error) {
+        console.error("Error updating student:", error);
+    }
+}
+
+async function deleteStudent(id) {
+    if (confirm("Are you sure you want to delete this student?")) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE"
+            });
+
+            if (response.ok) {
+                const message = await response.text();
+                resetForm();
+                alert(message);
+                getAllStudents();
+            }
+            else {
+                alert("Error deleting student.");
+            }
+        }
+        catch (error) {
+            console.error("Error deleting student:", error);
+        }
+    }
+}
